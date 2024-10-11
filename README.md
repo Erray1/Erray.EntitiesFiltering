@@ -7,3 +7,23 @@
 #### First part: name of entity`s property
 #### Second part: operation (!=, ==, <, <=, >, >=)
 #### Third part: value to compare
+
+## Example:
+```
+class MyEntity {
+	public int Count {get;set;}
+}
+
+app.MapGet("entities", async (
+	HttpContext httpContext, 
+	DbContext dbContext) => 
+	{
+		FilterOption[] filters = FilterOption.FromQueryString(httpContext.Request.Query);
+		List<MyEntity> entities = await dbContext
+			.Entities
+			.Filter(filters)
+			.ToListAsync();
+
+		await httpContext.Response.WriteAsJsonAsync(entities)
+	});
+```
