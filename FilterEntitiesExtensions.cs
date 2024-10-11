@@ -41,7 +41,8 @@ namespace Erray.EntitiesFiltering
                     Expression.MakeBinary(ExpressionType.AndAlso, binaryExpression, newBinary);
             }
             var cookedExpression = Expression.Lambda<Func<T, bool>>(binaryExpression);
-            return items.Where(cookedExpression);
+            var lambda = cookedExpression.Compile();
+            return items.Where(lambda);
         }
     }
 }

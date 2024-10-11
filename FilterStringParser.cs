@@ -9,22 +9,19 @@ using System.Threading.Tasks;
 
 namespace Erray.EntitiesFiltering
 {
-    internal static class FilterStringParser
+    internal class FilterStringParser<TEntity>
+        where TEntity : class
     {
-        private static int typeIndex = 0;
-        private static int propertyIndex = 1;
-        private static int operationIndex = 2;
-        private static int valueIndex = 3;
+        private static int propertyIndex = 0;
+        private static int operationIndex = 1;
+        private static int valueIndex = 2;
 
-        private static int numberOfComponents = 4;
-            //typeof(FilterStringParser)
-            //.GetProperties(System.Reflection.BindingFlags.Static)
-            //.Where(x => x.PropertyType == typeof(int))
-            //.Count();
+        private PropertyInfo[]? propertyInfos;
 
-        public static FilterRule<TarEntry>[] Parse<TEntity>(string input)
-            where TEntity : class
+        public FilterRule<TEntity>[] Parse(string input)
         {
+            Type entityType = typeof(TEntity);
+            propertyInfos = entityType.GetProperties();
             string[] filters = input.Split('/');
             FilterRule<TEntity>[] output = new FilterRule<TEntity>[filters.Length];
             for (int i = 0; i < output.Length; i++)
@@ -32,28 +29,19 @@ namespace Erray.EntitiesFiltering
                 string filter = filters[i];
                 string[] components = filter.Split('.');
 
-                CheckIfAllComponentsArePresent(components);
+                string propertyString = components[propertyIndex];
+                string operationString = components[operationIndex];
+                string valueString = components[valueIndex];
 
-                string typeString = components[0];
-                string propertyString = components[1];
-                string operationString = components[2];
-                string valueString = components[3];
-
-                Type entityType = typeof(TEntity);
-                string[] propertiesOfEntity = entityType.GetProperties().Select(x => x.Name).ToArray();
-                if (!propertiesOfEntity.Contains(propertyString))
+                if (!propertyInfos.Any(x => x.Name == propertyString))
                 {
                     throw new ParsingFiltersFailedException(propertyString, $"Entity {entityType.Name} does not contain property with such name");
-                }
-                if (!Types.TryGetValue(typeString, out Type type))
-                {
-                    throw new ParsingFiltersFailedException(propertyString, $"Wrong type declaration: {typeString}");
                 }
                 if (!Operations.TryGetValue(operationString, out ExpressionType operation))
                 {
                     throw new ParsingFiltersFailedException(propertyString, $"Wrong operation declaration: {operationString}");
                 }
-                object value = ConvertValueIfValid(valueString, type);
+                object value = ConvertValueIfValid(valueString, propertyString);
                 FilterRule<TEntity> rule = new FilterRule<TEntity>()
                 {
                     Operation = operation,
@@ -66,17 +54,11 @@ namespace Erray.EntitiesFiltering
             return output;
         }
 
-        private static void CheckIfAllComponentsArePresent(string[] components)
+        private object ConvertValueIfValid(string value, string propertyName)
         {
-            if (components is null 
-                || components.Count() != numberOfComponents 
-                || components.Any(x => string.IsNullOrEmpty(x)))
-            {
-                throw new ParsingFiltersFailedException("Not enough components in filter");
-            }
-        }
-        private static object ConvertValueIfValid(string value, Type destinationType)
-        {
+            var destinationType = propertyInfos
+                .Single(x => x.Name == propertyName)
+                .PropertyType;
             object converter = typeof(Converter<,>)
                 .MakeGenericType(typeof(string), destinationType);
             MethodInfo convertMethod = converter.GetType()

@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using System.Linq.Expressions;
 
 namespace Erray.EntitiesFiltering
@@ -10,12 +12,12 @@ namespace Erray.EntitiesFiltering
         public object Value { get; set; }
         public string PropertyName { get; set; }
         public ExpressionType Operation { get; set; }
-        public static FilterRule<TEntity>[]? FromQueryCollection(IQueryCollection query)
+        public static FilterRule<TEntity>[]? FromQueryString(IQueryCollection query)
         {
             bool containsFilters = query.TryGetValue("filters", out StringValues value);
             if (!containsFilters) return null;
             string filterString = value.ToString();
-            return FilterStringParser.Parse<TEntity>(filterString);
+            return new FilterStringParser<TEntity>().Parse(filterString);
         }
     }
 }
