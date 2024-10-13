@@ -15,10 +15,11 @@ class MyEntity {
 }
 
 app.MapGet("entities", async (
-	HttpContext httpContext, 
+	[FromQuery] string? filters,
+	HttpContext context,
 	DbContext dbContext) => 
 	{
-		FilterOption<MyEntity>[]? filters = FilterOption.FromQueryString(httpContext.Request.Query);
+		FilterOption<MyEntity>[]? filters = FilterOption.FromString(filters);
 		List<MyEntity> entities = await dbContext
 			.Entities
 			.Filter(filters)
