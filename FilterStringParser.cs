@@ -22,7 +22,7 @@ namespace Erray.EntitiesFiltering
         {
             Type entityType = typeof(TEntity);
             propertyInfos = entityType.GetProperties();
-            string[] filters = input.Split('/');
+            string[] filters = input.Split(',');
             FilterRule<TEntity>[] output = new FilterRule<TEntity>[filters.Length];
             for (int i = 0; i < output.Length; i++)
             {
@@ -59,13 +59,11 @@ namespace Erray.EntitiesFiltering
             var destinationType = propertyInfos
                 .Single(x => x.Name == propertyName)
                 .PropertyType;
-            object converter = typeof(Converter<,>)
-                .MakeGenericType(typeof(string), destinationType);
-            MethodInfo convertMethod = converter.GetType()
-                .GetMethod("Convert")!;
+            
+
             try
             {
-                object convertedValue = convertMethod.Invoke(converter, [value])!;
+                object convertedValue = Convert.ChangeType(value, destinationType);
                 return convertedValue;
             }
             catch (Exception ex) // Какое имя??

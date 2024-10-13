@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <Title>Erray.EntitiiesFiltering</Title>
     <Company>Erray</Company>
+    <Copyright>MIT</Copyright>
+    <Description>Entities filtering in IQueryable collections</Description>
+    <PackageTags>Filtering, IQueryable</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

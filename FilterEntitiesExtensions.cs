@@ -21,7 +21,7 @@ namespace Erray.EntitiesFiltering
                     newBinary :
                     Expression.MakeBinary(ExpressionType.AndAlso, binaryExpression, newBinary);
             }
-            var cookedExpression = Expression.Lambda<Func<T, bool>>(binaryExpression);
+            var cookedExpression = Expression.Lambda<Func<T, bool>>(binaryExpression, parameter);
             return query.Where(cookedExpression);
         }
         public static IEnumerable<T> Filter<T>(this IEnumerable<T> items, FilterRule<T>[]? filters)
@@ -40,7 +40,7 @@ namespace Erray.EntitiesFiltering
                     newBinary :
                     Expression.MakeBinary(ExpressionType.AndAlso, binaryExpression, newBinary);
             }
-            var cookedExpression = Expression.Lambda<Func<T, bool>>(binaryExpression);
+            var cookedExpression = Expression.Lambda<Func<T, bool>>(binaryExpression, parameter);
             var lambda = cookedExpression.Compile();
             return items.Where(lambda);
         }

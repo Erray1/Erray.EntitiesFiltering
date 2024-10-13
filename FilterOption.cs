@@ -16,7 +16,10 @@ namespace Erray.EntitiesFiltering
         {
             bool containsFilters = query.TryGetValue("filters", out StringValues value);
             if (!containsFilters) return null;
-            string filterString = value.ToString();
+            return FromString(value.ToString());
+        }
+        public static FilterRule<TEntity>[]? FromString(string filterString)
+        {
             return new FilterStringParser<TEntity>().Parse(filterString);
         }
     }
