@@ -18,7 +18,7 @@ app.MapGet("entities", async (
 	HttpContext httpContext, 
 	DbContext dbContext) => 
 	{
-		FilterOption[] filters = FilterOption.FromQueryString(httpContext.Request.Query);
+		FilterOption[] filters = FilterOption.FromQueryString(httpContext.Request.Query.Value);
 		List<MyEntity> entities = await dbContext
 			.Entities
 			.Filter(filters)

@@ -18,11 +18,13 @@ namespace Erray.EntitiesFiltering
 
         private PropertyInfo[]? propertyInfos;
 
-        public FilterRule<TEntity>[] Parse(string input)
+        public FilterRule<TEntity>[]? Parse(string input)
         {
             Type entityType = typeof(TEntity);
             propertyInfos = entityType.GetProperties();
             string[] filters = input.Split(',');
+            if (filters.Length == 0) return null;
+
             FilterRule<TEntity>[] output = new FilterRule<TEntity>[filters.Length];
             for (int i = 0; i < output.Length; i++)
             {
